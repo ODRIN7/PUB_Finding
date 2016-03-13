@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Pub_Finder</string>
+    <string name="Email">Email</string>
+    <string name="butt_login">Login</string>
+    <string name="textinput_passw">Password</string>
+    <string name="textview_Creatornot">No account yet? Create one</string>
+</resources>
