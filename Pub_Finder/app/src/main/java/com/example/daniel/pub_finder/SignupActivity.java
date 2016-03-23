@@ -21,12 +21,13 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
-
+    DBHandler dbHandler;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         ButterKnife.inject(this);
+
 
         _signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +83,8 @@ public class SignupActivity extends AppCompatActivity {
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        dbHandler.addUser(_nameText.getText().toString().trim());
+
         finish();
     }
 
@@ -120,5 +123,9 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    public SignupActivity(){
+        this.dbHandler = new DBHandler(this);
     }
 }
