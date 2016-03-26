@@ -4,4 +4,11 @@
     <string name="butt_login">Login</string>
     <string name="textinput_passw">Password</string>
     <string name="textview_Creatornot">No account yet? Create one</string>
+    <string-array name="availableFeatures">
+        <item>Kocsmák listázása</item>
+        <item>Kedvencek</item>
+        <item>Profilom</item>
+        <item>Kijelentkezés</item>
+        <item>Egyéb...</item>
+    </string-array>
 </resources>
