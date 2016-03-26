@@ -12,6 +12,8 @@ package com.example.daniel.pub_finder;
 
         import butterknife.ButterKnife;
         import butterknife.InjectView;
+        import entities.User;
+        import facade.DatabaseHandler;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
@@ -21,7 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
-    DBHandler dbHandler;
+    DatabaseHandler databaseHandler;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +74,8 @@ public class SignupActivity extends AppCompatActivity {
                     public void run() {
                         // On complete call either onSignupSuccess or onSignupFailed
                         // depending on success
-                        onSignupSuccess();
+                        Integer id= 112321;
+                        onSignupSuccess(Long.parseLong(id.toString()),_nameText.toString().trim(),_passwordText.toString().trim(),_emailText.toString().trim());
                         // onSignupFailed();
                         progressDialog.dismiss();
                     }
@@ -80,10 +83,9 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    public void onSignupSuccess() {
+    public void onSignupSuccess(Long userId, String name,String password, String emailAddres) {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
-        dbHandler.addUser(_nameText.getText().toString().trim());
 
         finish();
     }
@@ -126,6 +128,6 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public SignupActivity(){
-        this.dbHandler = new DBHandler(this);
+        this.databaseHandler = new DatabaseHandler(this);
     }
 }
