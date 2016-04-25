@@ -1,6 +1,7 @@
 package com.example.daniel.pub_finder;
 
         import android.app.ProgressDialog;
+        import android.content.Intent;
         import android.os.Bundle;
         import android.support.v7.app.AppCompatActivity;
         import android.util.Log;
@@ -10,20 +11,26 @@ package com.example.daniel.pub_finder;
         import android.widget.TextView;
         import android.widget.Toast;
 
+        import java.sql.SQLException;
+
         import butterknife.ButterKnife;
         import butterknife.InjectView;
-        import entities.User;
-        import facade.DatabaseHandler;
+        import com.example.daniel.entities.User;
+        import com.example.daniel.facades.DataBaseHelper;
+
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
+    private final DataBaseHelper<User> userDataBaseHelper;
+    private static final int REQUEST_LOGINUP= 0;
     @InjectView(R.id.input_name) EditText _nameText;
     @InjectView(R.id.input_email) EditText _emailText;
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
-    DatabaseHandler databaseHandler;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +81,12 @@ public class SignupActivity extends AppCompatActivity {
                     public void run() {
                         // On complete call either onSignupSuccess or onSignupFailed
                         // depending on success
-                        Integer id= 112321;
-                        onSignupSuccess(Long.parseLong(id.toString()),_nameText.toString().trim(),_passwordText.toString().trim(),_emailText.toString().trim());
+
+                        try {
+                            onSignupSuccess(_nameText.getText().toString().trim(),_passwordText.getText().toString().trim(),_emailText.getText().toString().trim());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
                         // onSignupFailed();
                         progressDialog.dismiss();
                     }
@@ -83,11 +94,18 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    public void onSignupSuccess(Long userId, String name,String password, String emailAddres) {
+    public void onSignupSuccess(String name,String password, String emailAddres) throws SQLException {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        User newuser = new User();
 
-        finish();
+        newuser.setName(name);
+        newuser.setPassword(password);
+        newuser.setEmailaddress(emailAddres);
+        userDataBaseHelper.createEntity(newuser);
+
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivityForResult(intent, REQUEST_LOGINUP);
     }
 
     public void onSignupFailed() {
@@ -128,6 +146,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public SignupActivity(){
-        this.databaseHandler = new DatabaseHandler(this);
+
+        this.userDataBaseHelper = new DataBaseHelper<User>(this,User.class);
     }
 }

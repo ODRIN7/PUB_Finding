@@ -1,6 +1,5 @@
-package entities.Pub_classes;
+package com.example.daniel.entities.Pub_classes;
 
-import java.util.List;
 import java.util.Random;
 
 /**

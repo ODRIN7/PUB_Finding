@@ -14,15 +14,29 @@ import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import com.example.daniel.entities.User;
+import com.example.daniel.facades.DataBaseHelper;
+
+import java.sql.SQLException;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
+
+
+    private  Login loginController;
+    private DataBaseHelper<User> userDataBaseHelper;
+
     @InjectView(R.id.input_email) EditText _emailText;
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_login) Button _loginButton;
     @InjectView(R.id.link_signup) TextView _signupLink;
+
+    public LoginActivity() {
+        this.userDataBaseHelper = new DataBaseHelper<User>(this,User.class);
+        loginController = new Login(this);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,7 +48,11 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                login();
+                try {
+                    login();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -49,10 +67,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void login() {
+    public void login() throws SQLException {
         Log.d(TAG, "Login");
 
         if (!validate()) {
+
+
             onLoginFailed();
             return;
         }
@@ -111,8 +131,9 @@ public class LoginActivity extends AppCompatActivity {
         _loginButton.setEnabled(true);
     }
 
-    public boolean validate() {
-        boolean valid = true;
+    public boolean validate() throws SQLException {
+        boolean valid = false;
+
 
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
@@ -129,6 +150,14 @@ public class LoginActivity extends AppCompatActivity {
             valid = false;
         } else {
             _passwordText.setError(null);
+        }
+        User user = loginController.doLogin(email,password);
+        if(user.getEmailaddress().trim().equals(email.trim())   ){
+            valid=true;
+        }
+        else
+        {
+            _emailText.setError("wrong Error " + user.getName()+ " "+ user.getPassword() +" " +user.getName() );
         }
 
         return valid;

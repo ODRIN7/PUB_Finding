@@ -1,4 +1,4 @@
-package facade;
+package com.example.daniel.pub_finder;
 
 import android.util.Base64;
 import android.util.Log;
@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by DANIEL on 2016. 03. 24..
  */
- class  Sha1Converter {
+class MySha1Converter {
 
     private  static String SHAHash;
     private static String result;

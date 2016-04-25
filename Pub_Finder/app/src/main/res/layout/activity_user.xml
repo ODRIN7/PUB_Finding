@@ -15,7 +15,7 @@
         android:id="@+id/tv_select"
         android:text="Select a feature from list:"
         android:layout_centerHorizontal="true"
-        android:textColor="black"
+        android:textColor="@color/black"
         android:textSize="25sp"/>
 
     <Spinner

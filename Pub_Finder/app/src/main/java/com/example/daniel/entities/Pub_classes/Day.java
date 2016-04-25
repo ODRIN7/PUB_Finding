@@ -1,6 +1,4 @@
-package entities.Pub_classes;
-
-import java.util.Date;
+package com.example.daniel.entities.Pub_classes;
 
 /**
  * Created by Balázs on 2016.03.26..
