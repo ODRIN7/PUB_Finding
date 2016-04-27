@@ -25,13 +25,13 @@
         android:id="@+id/spr_select"
         android:entries="@array/availableFeatures"
         android:background="#00d4ff" />
+    <fragment
+        android:id="@+id/titles"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+       class="com.example.daniel.pub_finder.ItemFragment" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lv_details"
-        android:layout_below="@+id/spr_select"
-        android:layout_alignParentStart="true"
-        android:background="#9c9c9c" />
+
 
 </RelativeLayout>

@@ -1,5 +1,7 @@
 package com.example.daniel.entities.Pub_classes;
 
+import com.j256.ormlite.field.DatabaseField;
+
 /**
  * Created by Balázs on 2016.03.26..
  */
@@ -15,11 +17,19 @@ enum Rating {
     NotRatedYet}
 
 public class Pub {
+    @DatabaseField(generatedId = true)
+    private Integer pub_id;
+    @DatabaseField
     private String name;
+    @DatabaseField
     private String description;
+    @DatabaseField
     private String address;
+    @DatabaseField
     private Rating rating;
+    @DatabaseField
     private String[] detailed_ratings; //Array but List would be better!
+  @DatabaseField
     private OpeningDays openingDays;
 
     public Pub(String name,String description,String address)
@@ -39,6 +49,13 @@ public class Pub {
         return openingDays.ToString();
     }
 
+    public Integer getPub_id() {
+        return pub_id;
+    }
+
+    public void setPub_id(Integer pub_id) {
+        this.pub_id = pub_id;
+    }
 
     //Properties
     public String getName() {

@@ -7,6 +7,7 @@ import java.util.Random;
  */
 public class OpeningDays {
 
+
     Day[] opening_days_array;
 
     public OpeningDays()

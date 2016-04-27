@@ -1,5 +1,7 @@
 package com.example.daniel.entities.Pub_classes;
 
+import com.j256.ormlite.field.DatabaseField;
+
 /**
  * Created by Balázs on 2016.03.26..
  */
@@ -9,10 +11,15 @@ enum Days {Monday, Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday};
 
 public class Day {
 
+    @DatabaseField
     private Days actualDay;
+    @DatabaseField
     private int from_hour;
+    @DatabaseField
     private int from_min;
+    @DatabaseField
     private int to_hour;
+@DatabaseField
     private int to_min;
 
     //Constructor

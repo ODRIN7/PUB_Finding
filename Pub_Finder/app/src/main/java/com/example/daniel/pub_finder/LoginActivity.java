@@ -1,7 +1,9 @@
 package com.example.daniel.pub_finder;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.example.daniel.entities.User;
 import com.example.daniel.facades.DataBaseHelper;
+import com.j256.ormlite.stmt.Where;
 
 import java.sql.SQLException;
 
@@ -24,18 +27,22 @@ public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_SIGNUP = 0;
 
 
+    private User user;
 
-    private  Login loginController;
     private DataBaseHelper<User> userDataBaseHelper;
 
-    @InjectView(R.id.input_email) EditText _emailText;
-    @InjectView(R.id.input_password) EditText _passwordText;
-    @InjectView(R.id.btn_login) Button _loginButton;
-    @InjectView(R.id.link_signup) TextView _signupLink;
+    @InjectView(R.id.input_email)
+    EditText _emailText;
+    @InjectView(R.id.input_password)
+    EditText _passwordText;
+    @InjectView(R.id.btn_login)
+    Button _loginButton;
+    @InjectView(R.id.link_signup)
+    TextView _signupLink;
 
     public LoginActivity() {
-        this.userDataBaseHelper = new DataBaseHelper<User>(this,User.class);
-        loginController = new Login(this);
+        this.userDataBaseHelper = new DataBaseHelper<User>(this, User.class);
+
     }
 
     @Override
@@ -61,8 +68,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Start the Signup activity
-                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                startActivityForResult(intent, REQUEST_SIGNUP);
+               // Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
+             //   startActivityForResult(intent, REQUEST_SIGNUP);
+                 Intent intent = new Intent(getApplicationContext(), activity_fragment_layout.class);
+                 startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
     }
@@ -122,7 +131,11 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
-        finish();
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra("user_id", user.getUser_id());
+        startActivity(intent);
+
+
     }
 
     public void onLoginFailed() {
@@ -151,13 +164,12 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             _passwordText.setError(null);
         }
-        User user = loginController.doLogin(email,password);
-        if(user.getEmailaddress().trim().equals(email.trim())   ){
-            valid=true;
-        }
-        else
-        {
-            _emailText.setError("wrong Error " + user.getName()+ " "+ user.getPassword() +" " +user.getName() );
+        Where<User, Integer> userIntegerWhere = userDataBaseHelper.getGenericDao().queryBuilder().where().eq("emailaddress", email).and().eq("password", (password));
+        user = userIntegerWhere.queryForFirst();
+        if (user.getEmailaddress().trim().equals(email.trim())) {
+            valid = true;
+        } else {
+            _emailText.setError("wrong Error " + user.getName() + " " + user.getPassword() + " " + user.getName());
         }
 
         return valid;

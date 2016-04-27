@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion "24.0.0 rc3"
 
     defaultConfig {
-        applicationId "com.example.daniel.pub_finder"
-        minSdkVersion 23
+        applicationId "com.example.daniel.myapplication1"
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -20,13 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-
-
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.jakewharton:butterknife:6.1.0'
-    compile 'com.j256.ormlite:ormlite-android:4.45'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
 }
