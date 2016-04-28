@@ -1,9 +1,7 @@
 package com.example.daniel.pub_finder;
 
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -16,6 +14,7 @@ import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+
 import com.example.daniel.entities.User;
 import com.example.daniel.facades.DataBaseHelper;
 import com.j256.ormlite.stmt.Where;
@@ -68,10 +67,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Start the Signup activity
-               // Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-             //   startActivityForResult(intent, REQUEST_SIGNUP);
-                 Intent intent = new Intent(getApplicationContext(), activity_fragment_layout.class);
-                 startActivityForResult(intent, REQUEST_SIGNUP);
+                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
+                startActivityForResult(intent, REQUEST_SIGNUP);
+
             }
         });
     }
@@ -131,11 +129,9 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, activity_fragment_layout.class);
         intent.putExtra("user_id", user.getUser_id());
         startActivity(intent);
-
-
     }
 
     public void onLoginFailed() {

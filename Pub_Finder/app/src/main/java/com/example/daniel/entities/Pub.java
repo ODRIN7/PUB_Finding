@@ -1,6 +1,13 @@
-package com.example.daniel.entities.Pub_classes;
+package com.example.daniel.entities;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Balázs on 2016.03.26..
@@ -15,7 +22,7 @@ enum Rating {
     Very_bad,
     Horrible,
     NotRatedYet}
-
+@DatabaseTable
 public class Pub {
     @DatabaseField(generatedId = true)
     private Integer pub_id;
@@ -27,26 +34,18 @@ public class Pub {
     private String address;
     @DatabaseField
     private Rating rating;
-    @DatabaseField
-    private String[] detailed_ratings; //Array but List would be better!
-  @DatabaseField
-    private OpeningDays openingDays;
 
-    public Pub(String name,String description,String address)
+
+    public Pub() {
+
+    }
+
+    public Pub(String name, String description, String address)
     {
         this.name = name;
         this.description = description;
         this.address = address;
         this.rating = Rating.NotRatedYet;
-        openingDays = new OpeningDays();
-
-        //Optional!
-        openingDays.FillWithRandomValues();
-    }
-
-    public String OpeningDays_ToString()
-    {
-        return openingDays.ToString();
     }
 
     public Integer getPub_id() {
@@ -57,7 +56,6 @@ public class Pub {
         this.pub_id = pub_id;
     }
 
-    //Properties
     public String getName() {
         return name;
     }
@@ -90,13 +88,6 @@ public class Pub {
         this.rating = rating;
     }
 
-    public String[] getDetailed_ratings() {
-        return detailed_ratings;
-    }
-
-    public void setDetailed_ratings(String[] detailed_ratings) {
-        this.detailed_ratings = detailed_ratings;
-    }
 
 }
 

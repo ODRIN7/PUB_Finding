@@ -45,6 +45,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.daniel.entities.Pub;
+import com.example.daniel.facades.DataBaseHelper;
+import com.j256.ormlite.stmt.Where;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 // Demonstration of using fragments to implement different activity layouts.
 // This sample provides a different layout (and activity flow) when run in
@@ -118,6 +126,8 @@ public class FragmentLayout extends Activity {
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
+
+
             super.onActivityCreated(savedInstanceState);
 
             // You can use getActivity(), which returns the activity associated
@@ -129,48 +139,65 @@ public class FragmentLayout extends Activity {
 
             // Populate list with our static array of titles in list in the
             // Shakespeare class
-            setListAdapter(new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.simple_list_item_activated_1,
-                    Shakespeare.TITLES));
+            try {
 
-            // Check to see if we have a frame in which to embed the details
-            // fragment directly in the containing UI.
-            // R.id.details relates to the res/layout-land/fragment_layout.xml
-            // This is first created when the phone is switched to landscape
-            // mode
 
-            View detailsFrame = getActivity().findViewById(R.id.details);
+                DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
+                pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
+                ;
 
-            Toast.makeText(getActivity(), "detailsFrame " + detailsFrame,
-                    Toast.LENGTH_LONG).show();
+                List<Pub> pubs = pubDataBaseHelper.getGenericDao().queryForAll();
 
-            // Check that a view exists and is visible
-            // A view is visible (0) on the screen; the default value.
-            // It can also be invisible and hidden, as if the view had not been
-            // added.
-            //
-            mDualPane = detailsFrame != null
-                    && detailsFrame.getVisibility() == View.VISIBLE;
+                String[] pubstoString = new String[pubs.size()];
+                for (int i = 0; i < pubs.size(); i++) {
+                    pubstoString[i] = pubs.get(i).getName();
+                }
+                setListAdapter(new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_list_item_activated_1, pubstoString));
 
-            Toast.makeText(getActivity(), "mDualPane " + mDualPane,
-                    Toast.LENGTH_LONG).show();
+                // Check to see if we have a frame in which to embed the details
+                // fragment directly in the containing UI.
+                // R.id.details relates to the res/layout-land/fragment_layout.xml
+                // This is first created when the phone is switched to landscape
+                // mode
 
-            if (savedInstanceState != null) {
-                // Restore last state for checked position.
-                mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
+                View detailsFrame = getActivity().findViewById(R.id.details);
+
+                Toast.makeText(getActivity(), "detailsFrame " + detailsFrame,
+                        Toast.LENGTH_LONG).show();
+
+                // Check that a view exists and is visible
+                // A view is visible (0) on the screen; the default value.
+                // It can also be invisible and hidden, as if the view had not been
+                // added.
+                //
+                mDualPane = detailsFrame != null
+                        && detailsFrame.getVisibility() == View.VISIBLE;
+
+                Toast.makeText(getActivity(), "mDualPane " + mDualPane,
+                        Toast.LENGTH_LONG).show();
+
+                if (savedInstanceState != null) {
+                    // Restore last state for checked position.
+                    mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
+                }
+
+                if (mDualPane) {
+                    // In dual-pane mode, the list view highlights the selected
+                    // item.
+                    getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                    // Make sure our UI is in the correct state.
+                    showDetails(mCurCheckPosition);
+                } else {
+                    // We also highlight in uni-pane just for fun
+                    getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                    getListView().setItemChecked(mCurCheckPosition, true);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-            if (mDualPane) {
-                // In dual-pane mode, the list view highlights the selected
-                // item.
-                getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                // Make sure our UI is in the correct state.
-                showDetails(mCurCheckPosition);
-            } else {
-                // We also highlight in uni-pane just for fun
-                getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                getListView().setItemChecked(mCurCheckPosition, true);
-            }
         }
 
         @Override
@@ -296,40 +323,61 @@ public class FragmentLayout extends Activity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
-                    Toast.LENGTH_LONG).show();
-            //
-            // if (container == null) {
-            // // We have different layouts, and in one of them this
-            // // fragment's containing frame doesn't exist. The fragment
-            // // may still be created from its saved state, but there is
-            // // no reason to try to create its view hierarchy because it
-            // // won't be displayed. Note this is not needed -- we could
-            // // just run the code below, where we would create and return
-            // // the view hierarchy; it would just never be used.
-            // return null;
-            // }
 
-            // If non-null, this is the parent view that the fragment's UI
-            // should be attached to. The fragment should not add the view
-            // itself, but this can be used to generate the LayoutParams of
-            // the view.
-            //
+                DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
+                pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
+                ;
 
-            // programmatically create a scrollview and texview for the text in
-            // the container/fragment layout. Set up the properties and add the
-            // view.
+                List<Pub> pubs =  new ArrayList<>();
 
-            ScrollView scroller = new ScrollView(getActivity());
-            TextView text = new TextView(getActivity());
-            int padding = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
-                            .getResources().getDisplayMetrics());
-            text.setPadding(padding, padding, padding, padding);
-            scroller.addView(text);
-            text.setText(Shakespeare.DIALOGUE[getShownIndex()]);
-            return scroller;
+            try {
+                pubs = pubDataBaseHelper.getGenericDao().queryForAll();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+
+            String[] pubstoString = new String[pubs.size()];
+                for (int i = 0; i < pubs.size(); i++) {
+                    pubstoString[i] = pubs.get(i).getDescription();
+                }
+
+                Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
+                        Toast.LENGTH_LONG).show();
+                //
+                // if (container == null) {
+                // // We have different layouts, and in one of them this
+                // // fragment's containing frame doesn't exist. The fragment
+                // // may still be created from its saved state, but there is
+                // // no reason to try to create its view hierarchy because it
+                // // won't be displayed. Note this is not needed -- we could
+                // // just run the code below, where we would create and return
+                // // the view hierarchy; it would just never be used.
+                // return null;
+                // }
+
+                // If non-null, this is the parent view that the fragment's UI
+                // should be attached to. The fragment should not add the view
+                // itself, but this can be used to generate the LayoutParams of
+                // the view.
+                //
+
+                // programmatically create a scrollview and texview for the text in
+                // the container/fragment layout. Set up the properties and add the
+                // view.
+
+                ScrollView scroller = new ScrollView(getActivity());
+                TextView text = new TextView(getActivity());
+                int padding = (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
+                                .getResources().getDisplayMetrics());
+                text.setPadding(padding, padding, padding, padding);
+                scroller.addView(text);
+                text.setText(pubstoString[getShownIndex()]);
+                return scroller;
+
         }
     }
-
 }
+
+

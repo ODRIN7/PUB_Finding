@@ -31,10 +31,12 @@ public class  DataBaseHelper<T> extends OrmLiteSqliteOpenHelper {
 
     }
 
+
+
     @Override
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
-            if(!genericDao.isTableExists()) {
+            if(!getGenericDao().isTableExists()) {
                 TableUtils.createTable(connectionSource,genericType);
             }
         } catch (SQLException e) {
@@ -46,7 +48,7 @@ public class  DataBaseHelper<T> extends OrmLiteSqliteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
-            if(!genericDao.isTableExists()) {
+            if(!getGenericDao().isTableExists()) {
                 TableUtils.dropTable(connectionSource, genericType, true);
             }
             onCreate(database,connectionSource);
