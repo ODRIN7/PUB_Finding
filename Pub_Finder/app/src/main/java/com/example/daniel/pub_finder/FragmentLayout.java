@@ -28,13 +28,23 @@
 
 package com.example.daniel.pub_finder;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,8 +57,13 @@ import android.widget.Toast;
 
 import com.example.daniel.entities.Pub;
 import com.example.daniel.facades.DataBaseHelper;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.j256.ormlite.stmt.Where;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +86,10 @@ public class FragmentLayout extends Activity {
         // res/layout/fragment_layout.xml (portrait mode) or
         // res/layout-land/fragment_layout.xml (landscape mode). This is done
         // automatically by the system.
+
+
         setContentView(R.layout.activity_activity_fragment_layout);
+
     }
 
     // This is a secondary activity, to show what the user has selected when the
@@ -103,9 +121,12 @@ public class FragmentLayout extends Activity {
                 details.setArguments(getIntent().getExtras());
 
                 //
+
+
                 getFragmentManager().beginTransaction()
                         .add(android.R.id.content, details).commit();
             }
+
         }
     }
 
@@ -324,57 +345,113 @@ public class FragmentLayout extends Activity {
                                  Bundle savedInstanceState) {
 
 
-                DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
-                pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
-                ;
+            DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
+            pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
+            ;
 
-                List<Pub> pubs =  new ArrayList<>();
+            List<Pub> pubs = new ArrayList<>();
 
             try {
                 pubs = pubDataBaseHelper.getGenericDao().queryForAll();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            AppCompatButton gpsAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.gpsPlace);
+            final List<Pub> finalPubs = pubs;
+            gpsAppCompatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), GpsActivity.class);
+                    intent.putExtra("pub_id", finalPubs.get(getShownIndex()).getPub_id());
+                    startActivityForResult(intent, 0);
 
-
-            String[] pubstoString = new String[pubs.size()];
-                for (int i = 0; i < pubs.size(); i++) {
-                    pubstoString[i] = pubs.get(i).getDescription();
+                    startActivity(intent);
                 }
+            });
 
-                Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
-                        Toast.LENGTH_LONG).show();
-                //
-                // if (container == null) {
-                // // We have different layouts, and in one of them this
-                // // fragment's containing frame doesn't exist. The fragment
-                // // may still be created from its saved state, but there is
-                // // no reason to try to create its view hierarchy because it
-                // // won't be displayed. Note this is not needed -- we could
-                // // just run the code below, where we would create and return
-                // // the view hierarchy; it would just never be used.
-                // return null;
-                // }
+            AppCompatButton downloadAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.download);
+            downloadAppCompatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DownloadManager manager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
+                    Uri Download_Uri = Uri.parse("https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/220px-PNG_transparency_demonstration_1.png");
+                    DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
+                    request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                    request.setAllowedOverRoaming(false);
+                    request.setTitle("Drinks");
+                    request.setDescription("See the drinks");
+                    request.setDestinationInExternalFilesDir(getActivity(),Environment.DIRECTORY_DOWNLOADS,"xxx.png");
+                    manager.enqueue(request);
+                    long  downloadReference = manager.enqueue(request);
+                    try {
+                        ParcelFileDescriptor file = manager.openDownloadedFile(downloadReference);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
 
-                // If non-null, this is the parent view that the fragment's UI
-                // should be attached to. The fragment should not add the view
-                // itself, but this can be used to generate the LayoutParams of
-                // the view.
-                //
+                }
+            });
 
-                // programmatically create a scrollview and texview for the text in
-                // the container/fragment layout. Set up the properties and add the
-                // view.
+            AppCompatButton callAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.bookTable);
+            callAppCompatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                ScrollView scroller = new ScrollView(getActivity());
-                TextView text = new TextView(getActivity());
-                int padding = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
-                                .getResources().getDisplayMetrics());
-                text.setPadding(padding, padding, padding, padding);
-                scroller.addView(text);
-                text.setText(pubstoString[getShownIndex()]);
-                return scroller;
+                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            ActivityCompat.requestPermissions(getActivity(),new String[]{
+                                    //  Manifest.permission.CALL_PHONE;
+                                    Manifest.permission.CALL_PHONE
+                            },10);
+                            return;
+                        }
+                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode("36307654321"))));
+                }
+            });
+            String[] pubstoString = new String[pubs.size()];
+            for (int i = 0; i < pubs.size(); i++) {
+                pubstoString[i] = pubs.get(i).getDescription();
+            }
+
+            Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
+                    Toast.LENGTH_LONG).show();
+            //
+            // if (container == null) {
+            // // We have different layouts, and in one of them this
+            // // fragment's containing frame doesn't exist. The fragment
+            // // may still be created from its saved state, but there is
+            // // no reason to try to create its view hierarchy because it
+            // // won't be displayed. Note this is not needed -- we could
+            // // just run the code below, where we would create and return
+            // // the view hierarchy; it would just never be used.
+            // return null;
+            // }
+
+            // If non-null, this is the parent view that the fragment's UI
+            // should be attached to. The fragment should not add the view
+            // itself, but this can be used to generate the LayoutParams of
+            // the view.
+            //
+
+            // programmatically create a scrollview and texview for the text in
+            // the container/fragment layout. Set up the properties and add the
+            // view.
+
+            ScrollView scroller = new ScrollView(getActivity());
+            TextView text = new TextView(getActivity());
+            int padding = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
+                            .getResources().getDisplayMetrics());
+            text.setPadding(padding, padding, padding, padding);
+            scroller.addView(text);
+            text.setText(pubstoString[getShownIndex()]);
+            return scroller;
 
         }
     }

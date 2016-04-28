@@ -30,6 +30,38 @@
 
         android:layout_below="@+id/spr_select"
         android:layout_alignParentRight="true"
-        android:background="?android:attr/detailsElementBackground" />
+        android:background="?android:attr/detailsElementBackground" >
+
+
+    </FrameLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/gpsPlace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="100dp"
+        android:text="See Location!"
+        android:layout_below="@+id/details"
+        android:layout_alignStart="@+id/details"
+        android:layout_gravity="center" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/bookTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="100dp"
+        android:text="Book table!"
+        android:layout_below="@+id/gpsPlace"
+        android:layout_alignStart="@+id/gpsPlace" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="See Drinks"
+        android:width="100dp"
+        android:layout_below="@+id/bookTable"
+        android:layout_alignEnd="@+id/bookTable" />
 
 </RelativeLayout>
