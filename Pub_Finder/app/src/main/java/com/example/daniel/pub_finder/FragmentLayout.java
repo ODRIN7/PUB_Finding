@@ -56,11 +56,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.daniel.entities.Pub;
+import com.example.daniel.entities.User;
 import com.example.daniel.facades.DataBaseHelper;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -85,6 +87,7 @@ import java.util.List;
 
 public class FragmentLayout extends Activity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,10 +103,11 @@ public class FragmentLayout extends Activity {
 
         setContentView(R.layout.activity_activity_fragment_layout);
 
+
     }
 
-    // This is a secondary activity, to show what the user has selected when the
-    // screen is not large enough to show it all in one activity.
+
+
 
     public static class DetailsActivity extends Activity {
 
@@ -140,20 +144,13 @@ public class FragmentLayout extends Activity {
         }
     }
 
-    // This is the "top-level" fragment, showing a list of items that the user
-    // can pick. Upon picking an item, it takes care of displaying the data to
-    // the user as appropriate based on the current UI layout.
 
-    // Displays a list of items that are managed by an adapter similar to
-    // ListActivity. It provides several methods for managing a list view, such
-    // as the onListItemClick() callback to handle click events.
 
     public static class TitlesFragment extends ListFragment {
         boolean mDualPane;
         int mCurCheckPosition = 0;
 
-
-
+        DataBaseHelper<Pub> pubDataBaseHelper;
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
 
@@ -166,7 +163,7 @@ public class FragmentLayout extends Activity {
 
 
             try {
-                DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
+               pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
                 pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
                 ;
 
@@ -178,7 +175,6 @@ public class FragmentLayout extends Activity {
                 }
                 setListAdapter(new ArrayAdapter<String>(getActivity(),
                         android.R.layout.simple_list_item_activated_1, pubstoString));
-
 
 
                 View detailsFrame = getActivity().findViewById(R.id.details);
@@ -234,7 +230,6 @@ public class FragmentLayout extends Activity {
         }
 
 
-
         void showDetails(int index) {
             mCurCheckPosition = index;
 
@@ -274,11 +269,15 @@ public class FragmentLayout extends Activity {
             }
         }
     }
+
     public static class DetailsFragment extends Fragment {
         private AppCompatRatingBar ratingBar;
         private AppCompatButton gpsAppCompatButton;
-        private  AppCompatRatingBar bestrate;
+        private AppCompatRatingBar bestrate;
         private AppCompatSpinner appCompatSpinner;
+        private List<Pub> pubs;
+        private User user;
+        DataBaseHelper<User> userDataBaseHelper;
         // Create a new instance of DetailsFragment, initialized to show the
         // text at 'index'.
 
@@ -296,8 +295,8 @@ public class FragmentLayout extends Activity {
         public int getShownIndex() {
             return getArguments().getInt("index", 0);
         }
-        private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
-                new LatLng(47.497622, 19.069209), new LatLng(47.497622, 19.069209));
+
+
         private static final int PLACE_PICKER_REQUEST = 1;
 
         @Override
@@ -306,8 +305,18 @@ public class FragmentLayout extends Activity {
             DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
             pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
             ;
+            this.userDataBaseHelper = new DataBaseHelper<User>(getActivity(),User.class);
+            Intent myIntent = getActivity().getIntent();
+            int iD =myIntent.getIntExtra("user_id",0);
 
-            List<Pub> pubs = new ArrayList<>();
+            try {
+
+                Where<User, Integer> userFind= userDataBaseHelper.getGenericDao().queryBuilder().where().eq("user_id",iD);
+                user =userFind.queryForFirst();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            pubs = new ArrayList<>();
 
             try {
                 pubs = pubDataBaseHelper.getGenericDao().queryForAll();
@@ -315,14 +324,12 @@ public class FragmentLayout extends Activity {
                 e.printStackTrace();
             }
 
-            final List<Pub> finalPubs = pubs;
-    downloadListener();
+            downloadListener();
             locationListener();
             callListener();
             addListenerOnRatingBar();
             bestRatelistner();
             spinnerListner();
-
 
 
             String[] pubstoString = new String[pubs.size()];
@@ -346,13 +353,15 @@ public class FragmentLayout extends Activity {
 
         }
 
+
+
         public void downloadListener() {
             AppCompatButton downloadAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.download);
             downloadAppCompatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     DownloadManager manager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
-                    Uri Download_Uri = Uri.parse("https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/220px-PNG_transparency_demonstration_1.png");
+                    Uri Download_Uri = Uri.parse(pubs.get(getShownIndex()).getDrinkURI());
                     DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
                     request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
                     request.setAllowedOverRoaming(false);
@@ -370,6 +379,8 @@ public class FragmentLayout extends Activity {
                 }
             });
         }
+        private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
+                new LatLng(47.497622, 19.069209), new LatLng(47.497622, 19.069209));
         public void locationListener() {
             gpsAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.gpsPlace);
             gpsAppCompatButton.setOnClickListener(new View.OnClickListener() {
@@ -378,7 +389,9 @@ public class FragmentLayout extends Activity {
                     try {
                         PlacePicker.IntentBuilder intentBuilder =
                                 new PlacePicker.IntentBuilder();
-                        intentBuilder.setLatLngBounds(BOUNDS_MOUNTAIN_VIEW);
+                      LatLngBounds publoc =  new LatLngBounds( new LatLng(pubs.get(getShownIndex()).getLat(),pubs.get(getShownIndex()).getLon()),
+                              new LatLng(pubs.get(getShownIndex()).getLat(),pubs.get(getShownIndex()).getLon()));
+                        intentBuilder.setLatLngBounds(publoc);
                         Intent intent = intentBuilder.build(getActivity());
                         startActivityForResult(intent, PLACE_PICKER_REQUEST);
 
@@ -390,7 +403,10 @@ public class FragmentLayout extends Activity {
             });
 
         }
-        public void callListener(){
+
+
+
+        private void callListener() {
             AppCompatButton callAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.bookTable);
             callAppCompatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -410,11 +426,12 @@ public class FragmentLayout extends Activity {
                         }, 10);
                         return;
                     }
-                    startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode("36307654321"))));
+                    startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode(pubs.get(getShownIndex()).getPhonenumber()))));
                 }
             });
         }
-        public void addListenerOnRatingBar() {
+
+        private void addListenerOnRatingBar() {
 
             ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
 
@@ -426,30 +443,40 @@ public class FragmentLayout extends Activity {
             });
 
         }
-        public  void  bestRatelistner(){
-             bestrate = (AppCompatRatingBar) getActivity().findViewById(R.id.bestrate);
-    bestrate.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
 
+        private void bestRatelistner() {
+            bestrate = (AppCompatRatingBar) getActivity().findViewById(R.id.bestrate);
+            bestrate.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    user.getBest_pub().add(pubs.get(getShownIndex()));
+                }
+            });
         }
-    });
+
+        private void rateBarListner() {
+            ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
+            ratingBar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //pubs.get(getShownIndex()).setRating(ratingBar.getRating());
+                }
+            });
         }
-        public  void spinnerListner(){
+
+        private void spinnerListner() {
             appCompatSpinner = (AppCompatSpinner) getActivity().findViewById(R.id.spr_select);
             appCompatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(appCompatSpinner.getSelectedItem().toString().equals("Logout"))
-                    {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class );
+                    if (appCompatSpinner.getSelectedItem().toString().equals("Logout")) {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
-                    }
-                    else   if(appCompatSpinner.getSelectedItem().toString().equals("Pubs")){
+                    } else if (appCompatSpinner.getSelectedItem().toString().equals("Pubs")) {
 
 
-                    }
-                    else if (appCompatSpinner.getSelectedItem().toString().equals("Favourite")){
+                    } else if (appCompatSpinner.getSelectedItem().toString().equals("Favourite")) {
+                      //  pubs = pubDataBaseHelper.getGenericDao().queryForAll();
 
                     }
                 }

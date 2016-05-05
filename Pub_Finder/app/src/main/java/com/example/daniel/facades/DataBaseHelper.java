@@ -28,7 +28,6 @@ public class  DataBaseHelper<T> extends OrmLiteSqliteOpenHelper {
     public DataBaseHelper(Context context, Class<T> genericType) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.genericType=genericType;
-
     }
 
 
@@ -59,25 +58,40 @@ public class  DataBaseHelper<T> extends OrmLiteSqliteOpenHelper {
 
 
     public <T> T createEntity(T entity) throws SQLException {
-        getGenericDao().create(entity);
+        if(!getGenericDao().isTableExists()) {
+            onCreate(super.getWritableDatabase(), super.connectionSource);
+        }
+            getGenericDao().create(entity);
         return entity;
     }
 
 
     public <T> T updateEntity( T entity) throws SQLException {
+        if(!getGenericDao().isTableExists()) {
+            onCreate(super.getWritableDatabase(), super.connectionSource);
+        }
         getGenericDao().createOrUpdate(entity);
+
         return entity;
     }
 
 
     public <T> T getEntityById(Class<T> entityClass, Integer id) throws SQLException {
-        return (T) getGenericDao().queryForId((Object)id);
+        if(!getGenericDao().isTableExists()) {
+            onCreate(super.getReadableDatabase(), super.connectionSource);
+        }
+        T getObject = (T) getGenericDao().queryForId((Object)id);
+        return getObject;
     }
 
 
     public <T> T removeEntity(Class<T> entityClass, Integer id) throws SQLException {
+        if(!getGenericDao().isTableExists()) {
+            onCreate(super.getReadableDatabase(), super.connectionSource);
+        }
         T entity = getEntityById(entityClass, id);
         getGenericDao().delete(entity);
+
         return entity;
     }
     public Dao getGenericDao() throws SQLException {

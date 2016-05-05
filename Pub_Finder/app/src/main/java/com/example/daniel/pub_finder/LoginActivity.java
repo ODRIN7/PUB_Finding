@@ -1,6 +1,7 @@
 package com.example.daniel.pub_finder;
 
 import android.app.ProgressDialog;
+import android.media.Rating;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+import com.example.daniel.entities.MyPubRating;
+import com.example.daniel.entities.Pub;
 import com.example.daniel.entities.User;
 import com.example.daniel.facades.DataBaseHelper;
 
@@ -25,6 +28,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.j256.ormlite.stmt.Where;
 import com.facebook.FacebookSdk;
+import com.example.daniel.entities.Pub;
 import java.sql.SQLException;
 
 public class LoginActivity extends AppCompatActivity {
@@ -58,11 +62,16 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        init();
+        try {
+            init();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void init() {
+    public void init() throws SQLException {
         callbackManager = CallbackManager.Factory.create();
+        initData();
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -161,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         Where<User, Integer> userIntegerWhere = userDataBaseHelper.getGenericDao().queryBuilder().where().eq("emailaddress", email).and().eq("password", (password));
         user = userIntegerWhere.queryForFirst();
-        if (user !=null && user.getEmailaddress().trim().equals(email.trim()) && user.getPassword().trim().equals(password.trim())) {
+        if (user != null && user.getEmailaddress().trim().equals(email.trim()) && user.getPassword().trim().equals(password.trim())) {
             valid = true;
         } else {
             _emailText.setError("wrong Error " + user.getName() + " " + user.getPassword() + " " + user.getName());
@@ -185,7 +194,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
     public void FacebookLogin() {
 
         loginButton.setReadPermissions("email");
@@ -201,9 +209,9 @@ public class LoginActivity extends AppCompatActivity {
                 String userId = loginResult.getAccessToken().getUserId();
                 String accessToken = loginResult.getAccessToken().getToken();
                 try {
-                 User user =  userDataBaseHelper.getEntityById(User.class,Integer.parseInt(userId));
-                    if(user==null){
-                        User newuser =new User();
+                    User user = userDataBaseHelper.getEntityById(User.class, Integer.parseInt(userId));
+                    if (user == null) {
+                        User newuser = new User();
                         newuser.setEmailaddress(userId);
                         newuser.setPassword(accessToken);
                         userDataBaseHelper.createEntity(newuser);
@@ -222,9 +230,23 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(FacebookException error) {
-                Toast.makeText(LoginActivity.this, "Login error"+error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Login error" + error, Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void initData() throws SQLException {
+        DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(this, Pub.class);
+
+        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma","Ez egy kocsma a körútnál","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.i2symbol.com/images/myspace/symbols/ballot_x_u2717_icon_256x256.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma1","Ez egy kocsma a körútnál1","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma2","Ez egy kocsma a körútnál2","Címe ez1",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma3","Ez egy kocsma a körútnál3","Címe ez2",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma4","Ez egy kocsma a körútnál4","Címe ez3",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+
+
+
+    }
+
 
 }
