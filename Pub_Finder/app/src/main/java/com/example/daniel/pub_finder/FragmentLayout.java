@@ -44,12 +44,17 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatRatingBar;
+import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -57,10 +62,15 @@ import android.widget.Toast;
 
 import com.example.daniel.entities.Pub;
 import com.example.daniel.facades.DataBaseHelper;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.j256.ormlite.stmt.Where;
 
 import java.io.FileNotFoundException;
@@ -142,8 +152,7 @@ public class FragmentLayout extends Activity {
         boolean mDualPane;
         int mCurCheckPosition = 0;
 
-        // onActivityCreated() is called when the activity's onCreate() method
-        // has returned.
+
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
@@ -151,18 +160,12 @@ public class FragmentLayout extends Activity {
 
             super.onActivityCreated(savedInstanceState);
 
-            // You can use getActivity(), which returns the activity associated
-            // with a fragment.
-            // The activity is a context (since Activity extends Context) .
 
             Toast.makeText(getActivity(), "TitlesFragment:onActivityCreated",
                     Toast.LENGTH_LONG).show();
 
-            // Populate list with our static array of titles in list in the
-            // Shakespeare class
+
             try {
-
-
                 DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
                 pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
                 ;
@@ -176,22 +179,13 @@ public class FragmentLayout extends Activity {
                 setListAdapter(new ArrayAdapter<String>(getActivity(),
                         android.R.layout.simple_list_item_activated_1, pubstoString));
 
-                // Check to see if we have a frame in which to embed the details
-                // fragment directly in the containing UI.
-                // R.id.details relates to the res/layout-land/fragment_layout.xml
-                // This is first created when the phone is switched to landscape
-                // mode
+
 
                 View detailsFrame = getActivity().findViewById(R.id.details);
 
                 Toast.makeText(getActivity(), "detailsFrame " + detailsFrame,
                         Toast.LENGTH_LONG).show();
 
-                // Check that a view exists and is visible
-                // A view is visible (0) on the screen; the default value.
-                // It can also be invisible and hidden, as if the view had not been
-                // added.
-                //
                 mDualPane = detailsFrame != null
                         && detailsFrame.getVisibility() == View.VISIBLE;
 
@@ -204,13 +198,11 @@ public class FragmentLayout extends Activity {
                 }
 
                 if (mDualPane) {
-                    // In dual-pane mode, the list view highlights the selected
-                    // item.
+
                     getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                    // Make sure our UI is in the correct state.
+
                     showDetails(mCurCheckPosition);
                 } else {
-                    // We also highlight in uni-pane just for fun
                     getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                     getListView().setItemChecked(mCurCheckPosition, true);
                 }
@@ -230,9 +222,6 @@ public class FragmentLayout extends Activity {
             outState.putInt("curChoice", mCurCheckPosition);
         }
 
-        // If the user clicks on an item in the list (e.g., Henry V then the
-        // onListItemClick() method is called. It calls a helper function in
-        // this case.
 
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
@@ -244,32 +233,21 @@ public class FragmentLayout extends Activity {
             showDetails(position);
         }
 
-        // Helper function to show the details of a selected item, either by
-        // displaying a fragment in-place in the current UI, or starting a whole
-        // new activity in which it is displayed.
+
 
         void showDetails(int index) {
             mCurCheckPosition = index;
 
-            // The basic design is mutli-pane (landscape on the phone) allows us
-            // to display both fragments (titles and details) with in the same
-            // activity; that is FragmentLayout -- one activity with two
-            // fragments.
-            // Else, it's single-pane (portrait on the phone) and we fire
-            // another activity to render the details fragment - two activities
-            // each with its own fragment .
-            //
+
             if (mDualPane) {
-                // We can display everything in-place with fragments, so update
-                // the list to highlight the selected item and show the data.
-                // We keep highlighted the current selection
+
                 getListView().setItemChecked(index, true);
 
-                // Check what fragment is currently shown, replace if needed.
+
                 DetailsFragment details = (DetailsFragment) getFragmentManager()
                         .findFragmentById(R.id.details);
                 if (details == null || details.getShownIndex() != index) {
-                    // Make new fragment to show this selection.
+
 
                     details = DetailsFragment.newInstance(index);
 
@@ -277,8 +255,6 @@ public class FragmentLayout extends Activity {
                             "showDetails dual-pane: create and relplace fragment",
                             Toast.LENGTH_LONG).show();
 
-                    // Execute a transaction, replacing any existing fragment
-                    // with this one inside the frame.
                     FragmentTransaction ft = getFragmentManager()
                             .beginTransaction();
                     ft.replace(R.id.details, details);
@@ -287,32 +263,22 @@ public class FragmentLayout extends Activity {
                 }
 
             } else {
-                // Otherwise we need to launch a new activity to display
-                // the dialog fragment with selected text.
-                // That is: if this is a single-pane (e.g., portrait mode on a
-                // phone) then fire DetailsActivity to display the details
-                // fragment
 
-                // Create an intent for starting the DetailsActivity
                 Intent intent = new Intent();
 
-                // explicitly set the activity context and class
-                // associated with the intent (context, class)
                 intent.setClass(getActivity(), DetailsActivity.class);
 
-                // pass the current position
                 intent.putExtra("index", index);
 
                 startActivity(intent);
             }
         }
     }
-
-    // This is the secondary fragment, displaying the details of a particular
-    // item.
-
     public static class DetailsFragment extends Fragment {
-
+        private AppCompatRatingBar ratingBar;
+        private AppCompatButton gpsAppCompatButton;
+        private  AppCompatRatingBar bestrate;
+        private AppCompatSpinner appCompatSpinner;
         // Create a new instance of DetailsFragment, initialized to show the
         // text at 'index'.
 
@@ -330,21 +296,13 @@ public class FragmentLayout extends Activity {
         public int getShownIndex() {
             return getArguments().getInt("index", 0);
         }
-
-        // The system calls this when it's time for the fragment to draw its
-        // user interface for the first time. To draw a UI for your fragment,
-        // you must return a View from this method that is the root of your
-        // fragment's layout. You can return null if the fragment does not
-        // provide a UI.
-
-        // We create the UI with a scrollview and text and return a reference to
-        // the scoller which is then drawn to the screen
+        private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
+                new LatLng(47.497622, 19.069209), new LatLng(47.497622, 19.069209));
+        private static final int PLACE_PICKER_REQUEST = 1;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
-
             DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(getActivity(), Pub.class);
             pubDataBaseHelper.onCreate(pubDataBaseHelper.getWritableDatabase(), pubDataBaseHelper.getConnectionSource())
             ;
@@ -356,19 +314,39 @@ public class FragmentLayout extends Activity {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            AppCompatButton gpsAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.gpsPlace);
+
             final List<Pub> finalPubs = pubs;
-            gpsAppCompatButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getActivity(), GpsActivity.class);
-                    intent.putExtra("pub_id", finalPubs.get(getShownIndex()).getPub_id());
-                    startActivityForResult(intent, 0);
+    downloadListener();
+            locationListener();
+            callListener();
+            addListenerOnRatingBar();
+            bestRatelistner();
+            spinnerListner();
 
-                    startActivity(intent);
-                }
-            });
 
+
+            String[] pubstoString = new String[pubs.size()];
+            for (int i = 0; i < pubs.size(); i++) {
+                pubstoString[i] = pubs.get(i).getDescription();
+            }
+
+            Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
+                    Toast.LENGTH_LONG).show();
+
+            ScrollView scroller = new ScrollView(getActivity());
+            TextView text = new TextView(getActivity());
+            int padding = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
+                            .getResources().getDisplayMetrics());
+            text.setPadding(padding, padding, padding, padding);
+            scroller.addView(text);
+            AppCompatTextView appCompatTextView = (AppCompatTextView) getActivity().findViewById(R.id.description);
+            appCompatTextView.setText(pubs.get(getShownIndex()).getDescription());
+            return scroller;
+
+        }
+
+        public void downloadListener() {
             AppCompatButton downloadAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.download);
             downloadAppCompatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -380,9 +358,9 @@ public class FragmentLayout extends Activity {
                     request.setAllowedOverRoaming(false);
                     request.setTitle("Drinks");
                     request.setDescription("See the drinks");
-                    request.setDestinationInExternalFilesDir(getActivity(),Environment.DIRECTORY_DOWNLOADS,"xxx.png");
+                    request.setDestinationInExternalFilesDir(getActivity(), Environment.DIRECTORY_DOWNLOADS, "xxx.png");
                     manager.enqueue(request);
-                    long  downloadReference = manager.enqueue(request);
+                    long downloadReference = manager.enqueue(request);
                     try {
                         ParcelFileDescriptor file = manager.openDownloadedFile(downloadReference);
                     } catch (FileNotFoundException e) {
@@ -391,69 +369,98 @@ public class FragmentLayout extends Activity {
 
                 }
             });
+        }
+        public void locationListener() {
+            gpsAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.gpsPlace);
+            gpsAppCompatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        PlacePicker.IntentBuilder intentBuilder =
+                                new PlacePicker.IntentBuilder();
+                        intentBuilder.setLatLngBounds(BOUNDS_MOUNTAIN_VIEW);
+                        Intent intent = intentBuilder.build(getActivity());
+                        startActivityForResult(intent, PLACE_PICKER_REQUEST);
 
+                    } catch (GooglePlayServicesRepairableException
+                            | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        }
+        public void callListener(){
             AppCompatButton callAppCompatButton = (AppCompatButton) getActivity().findViewById(R.id.bookTable);
             callAppCompatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            ActivityCompat.requestPermissions(getActivity(),new String[]{
-                                    //  Manifest.permission.CALL_PHONE;
-                                    Manifest.permission.CALL_PHONE
-                            },10);
-                            return;
-                        }
-                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode("36307654321"))));
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{
+                                //  Manifest.permission.CALL_PHONE;
+                                Manifest.permission.CALL_PHONE
+                        }, 10);
+                        return;
+                    }
+                    startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode("36307654321"))));
                 }
             });
-            String[] pubstoString = new String[pubs.size()];
-            for (int i = 0; i < pubs.size(); i++) {
-                pubstoString[i] = pubs.get(i).getDescription();
-            }
+        }
+        public void addListenerOnRatingBar() {
 
-            Toast.makeText(getActivity(), "DetailsFragment:onCreateView",
-                    Toast.LENGTH_LONG).show();
-            //
-            // if (container == null) {
-            // // We have different layouts, and in one of them this
-            // // fragment's containing frame doesn't exist. The fragment
-            // // may still be created from its saved state, but there is
-            // // no reason to try to create its view hierarchy because it
-            // // won't be displayed. Note this is not needed -- we could
-            // // just run the code below, where we would create and return
-            // // the view hierarchy; it would just never be used.
-            // return null;
-            // }
+            ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
 
-            // If non-null, this is the parent view that the fragment's UI
-            // should be attached to. The fragment should not add the view
-            // itself, but this can be used to generate the LayoutParams of
-            // the view.
-            //
-
-            // programmatically create a scrollview and texview for the text in
-            // the container/fragment layout. Set up the properties and add the
-            // view.
-
-            ScrollView scroller = new ScrollView(getActivity());
-            TextView text = new TextView(getActivity());
-            int padding = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 4, getActivity()
-                            .getResources().getDisplayMetrics());
-            text.setPadding(padding, padding, padding, padding);
-            scroller.addView(text);
-            text.setText(pubstoString[getShownIndex()]);
-            return scroller;
+            ratingBar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    float a = ratingBar.getRating();
+                }
+            });
 
         }
+        public  void  bestRatelistner(){
+             bestrate = (AppCompatRatingBar) getActivity().findViewById(R.id.bestrate);
+    bestrate.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+        }
+    });
+        }
+        public  void spinnerListner(){
+            appCompatSpinner = (AppCompatSpinner) getActivity().findViewById(R.id.spr_select);
+            appCompatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(appCompatSpinner.getSelectedItem().toString().equals("Logout"))
+                    {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class );
+                        startActivity(intent);
+                    }
+                    else   if(appCompatSpinner.getSelectedItem().toString().equals("Pubs")){
+
+
+                    }
+                    else if (appCompatSpinner.getSelectedItem().toString().equals("Favourite")){
+
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
+
     }
 }
 

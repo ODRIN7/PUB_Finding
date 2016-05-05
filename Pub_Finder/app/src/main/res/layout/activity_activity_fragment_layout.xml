@@ -2,38 +2,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
 
     <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/spr_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/spr_select"
-        android:entries="@array/availableFeatures"
-        android:background="#00d4ff" />
+        android:background="#00d4ff"
+        android:entries="@array/availableFeatures" />
 
     <fragment
         android:id="@+id/titles"
+        class="com.example.daniel.pub_finder.FragmentLayout$TitlesFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
-        android:layout_below="@+id/spr_select"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/details"
-
-        class="com.example.daniel.pub_finder.FragmentLayout$TitlesFragment" />
+        android:layout_below="@+id/spr_select"
+        android:layout_toLeftOf="@+id/details" />
 
     <FrameLayout
         android:id="@+id/details"
-        android:layout_width="220dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
-
-        android:layout_below="@+id/spr_select"
         android:layout_alignParentRight="true"
-        android:background="?android:attr/detailsElementBackground" >
+        android:layout_below="@+id/spr_select"
+        android:background="?android:attr/detailsElementBackground">
 
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/bookTable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:width="100dp"
+            android:text="Book table!" />
 
     </FrameLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/ratingBar"
+        android:layout_alignStart="@+id/ratingBar" />
+
+    <android.support.v7.widget.AppCompatRatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:rating="0.0"
+        android:stepSize="1.0"
+        android:layout_below="@+id/gpsPlace"
+        android:layout_alignParentEnd="true" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:width="100dp"
+        android:text="See Drinks"
+        android:layout_below="@+id/details"
+        android:layout_alignStart="@+id/details" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/gpsPlace"
@@ -41,27 +73,25 @@
         android:layout_height="wrap_content"
         android:width="100dp"
         android:text="See Location!"
-        android:layout_below="@+id/details"
-        android:layout_alignStart="@+id/details"
-        android:layout_gravity="center" />
-
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/bookTable"
+        android:layout_below="@+id/download"
+        android:layout_alignStart="@+id/download" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/favouriteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:width="100dp"
-        android:text="Book table!"
-        android:layout_below="@+id/gpsPlace"
-        android:layout_alignStart="@+id/gpsPlace" />
-
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/download"
+        android:text="Add to favourite"
+        android:layout_above="@+id/bestrate"
+        android:layout_alignStart="@+id/bestrate" />
+    <android.support.v7.widget.AppCompatRatingBar
+        android:id="@+id/bestrate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:numStars="1"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:layout_gravity="right|center_vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/description" />
 
-        android:text="See Drinks"
-        android:width="100dp"
-        android:layout_below="@+id/bookTable"
-        android:layout_alignEnd="@+id/bookTable" />
 
 </RelativeLayout>

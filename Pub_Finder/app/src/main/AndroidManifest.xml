@@ -21,22 +21,23 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".SignupActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".UserActivity" />
-        <activity android:name=".HomeActivity" />
         <activity android:name=".activity_fragment_layout" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBpmlMP95NVb-EVMWyajqm1N773Gdzay6A" />
-
-        <activity android:name=".GpsActivity"></activity>
     </application>
 
 </manifest>

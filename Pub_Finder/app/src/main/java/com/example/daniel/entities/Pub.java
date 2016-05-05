@@ -1,5 +1,6 @@
 package com.example.daniel.entities;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -35,6 +36,48 @@ public class Pub {
     @DatabaseField
     private Rating rating;
 
+    @DatabaseField
+    private Integer lat;
+    @DatabaseField
+    private Integer lon;
+    @DatabaseField
+    private String drinkURI;
+
+    public static final String User_ID_FIELD = "user_id";
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = User_ID_FIELD)
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Integer getLat() {
+        return lat;
+    }
+
+    public void setLat(Integer lat) {
+        this.lat = lat;
+    }
+
+    public Integer getLon() {
+        return lon;
+    }
+
+    public void setLon(Integer lon) {
+        this.lon = lon;
+    }
+
+    public String getDrinkURI() {
+        return drinkURI;
+    }
+
+    public void setDrinkURI(String drinkURI) {
+        this.drinkURI = drinkURI;
+    }
 
     public Pub() {
 
