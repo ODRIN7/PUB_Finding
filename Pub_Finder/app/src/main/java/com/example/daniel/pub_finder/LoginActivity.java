@@ -173,7 +173,8 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null && user.getEmailaddress().trim().equals(email.trim()) && user.getPassword().trim().equals(password.trim())) {
             valid = true;
         } else {
-            _emailText.setError("wrong Error " + user.getName() + " " + user.getPassword() + " " + user.getName());
+            _emailText.setError("Bad email  OR Bad password");
+            _passwordText.setError("Bad email  OR Bad password");
         }
 
         return valid;
@@ -238,11 +239,11 @@ public class LoginActivity extends AppCompatActivity {
     private void initData() throws SQLException {
         DataBaseHelper<Pub> pubDataBaseHelper = new DataBaseHelper<Pub>(this, Pub.class);
 
-        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma","Ez egy kocsma a körútnál","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.i2symbol.com/images/myspace/symbols/ballot_x_u2717_icon_256x256.png","06304371402"));
-        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma1","Ez egy kocsma a körútnál1","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
-        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma2","Ez egy kocsma a körútnál2","Címe ez1",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
-        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma3","Ez egy kocsma a körútnál3","Címe ez2",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
-        pubDataBaseHelper.createEntity(new Pub("Akácfa kocsma4","Ez egy kocsma a körútnál4","Címe ez3",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Hetker pub","Ez egy kocsma a körútnál","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.i2symbol.com/images/myspace/symbols/ballot_x_u2717_icon_256x256.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Akácfa","Ez egy kocsma a hétker mellet","Címe ez",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06304371402"));
+        pubDataBaseHelper.createEntity(new Pub("Shot","Ez egy kocsma király ucánál","Címe ez1",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06301231402"));
+        pubDataBaseHelper.createEntity(new Pub("4-6-os söröző","Ez wessi","Címe ez2",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06302351402"));
+        pubDataBaseHelper.createEntity(new Pub("Andersen","Ez egy kocsma","Címe ez3",MyPubRating.Middling,47.497622, 19.069209,"http://www.antaragni.in/assets/img/proevents/into.png","06306541402"));
 
 
 

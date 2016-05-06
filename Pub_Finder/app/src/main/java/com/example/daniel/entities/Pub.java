@@ -15,7 +15,8 @@ public class Pub {
     private String address;
     @DatabaseField
     private MyPubRating rating;
-
+    @DatabaseField
+    private Float rate;
     @DatabaseField
     private double lat;
     @DatabaseField
@@ -85,14 +86,15 @@ public class Pub {
         this.drinkURI = drinkURI;
         this.phonenumber = phonenumber;
         this.user = null;
+        rate = Float.parseFloat("0.0");
     }
 
-    public Pub(String name, String description, String address)
-    {
+    public Pub(String name, String description, String address) {
         this.name = name;
         this.description = description;
         this.address = address;
         this.rating = MyPubRating.NotRatedYet;
+        rate = Float.parseFloat("0.0");
     }
 
     public Integer getPub_id() {
@@ -128,6 +130,17 @@ public class Pub {
     }
 
     public MyPubRating getRating() {
+        if (getRate() >= 5) {
+            setRating(MyPubRating.Perfect);
+        } else if (getRate() >= 4) {
+            setRating(MyPubRating.Very_nice);
+        } else if (getRate() >= 3) {
+            setRating(MyPubRating.Nice);
+        } else if (getRate() >= 2) {
+            setRating(MyPubRating.Middling);
+        } else {
+            setRating(MyPubRating.Bad);
+        }
         return rating;
     }
 
@@ -135,7 +148,13 @@ public class Pub {
         this.rating = rating;
     }
 
+    public Float getRate() {
+        return rate;
+    }
 
+    public void setRate(Float rate) {
+        this.rate = rate;
+    }
 }
 
 

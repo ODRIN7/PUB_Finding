@@ -75,23 +75,34 @@
         android:text="See Location!"
         android:layout_below="@+id/download"
         android:layout_alignStart="@+id/download" />
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/favouriteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add to favourite"
-        android:layout_above="@+id/bestrate"
-        android:layout_alignStart="@+id/bestrate" />
-    <android.support.v7.widget.AppCompatRatingBar
-        android:id="@+id/bestrate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="1"
-        android:rating="0"
-        android:stepSize="1.0"
-        android:layout_gravity="right|center_vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/description" />
 
+    <android.support.v7.widget.AppCompatButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add to Favourite"
+        android:id="@+id/favouritebutton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/description"
+        android:layout_marginBottom="58dp"
+        android:layout_alignEnd="@+id/description" />
+    <android.support.v7.widget.AppCompatButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remove From Favourite"
+        android:id="@+id/removefavouritebutton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/favouritebutton"
+        android:layout_alignParentEnd="true" />
+    <android.support.v7.widget.AppCompatButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate"
+        android:id="@+id/rateButton"
+        android:layout_above="@+id/ratingBar"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/gpsPlace" />
 
 </RelativeLayout>

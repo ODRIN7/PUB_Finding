@@ -6,10 +6,8 @@
     <string name="textview_Creatornot">No account yet? Create one</string>
     <string-array name="availableFeatures">
         <item>Pubs</item>
-        <item>Kedvencek</item>
-        <item>Profilom</item>
+        <item>Favourite</item>
         <item>Logout</item>
-        <item>Egyéb...</item>
     </string-array>
     <string name="facebook_app_id">1393615693997441</string>
 

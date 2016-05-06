@@ -10,6 +10,4 @@ public enum MyPubRating {
     Nice,
     Middling,
     Bad,
-    Very_bad,
-    Horrible,
     NotRatedYet}
