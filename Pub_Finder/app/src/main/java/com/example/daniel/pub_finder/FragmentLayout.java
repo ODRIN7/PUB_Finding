@@ -110,6 +110,7 @@ public class FragmentLayout extends Activity {
 
     public static class TitlesFragment extends ListFragment {
         boolean mDualPane;
+        private AppCompatRatingBar ratingBar;
         int mCurCheckPosition = 0;
         AppCompatSpinner appCompatSpinner;
         DataBaseHelper<Pub> pubDataBaseHelper;
@@ -148,7 +149,7 @@ public class FragmentLayout extends Activity {
 
                 View detailsFrame = getActivity().findViewById(R.id.details);
 
-
+                ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
 
                 mDualPane = detailsFrame != null
                         && detailsFrame.getVisibility() == View.VISIBLE;
@@ -208,6 +209,7 @@ public class FragmentLayout extends Activity {
             } else if (pubs.get(index).getRating() == MyPubRating.Bad) {
                 ratenum = Float.parseFloat("1.0");
             }
+ratingBar.setRating(ratenum);
 
             if (mDualPane) {
 
@@ -241,7 +243,7 @@ public class FragmentLayout extends Activity {
                 startActivity(intent);
             }
         }
-
+       public static  ArrayAdapter<String> arrayadapterPubTitle;
         private void refereshScreen(boolean refreshBest, List<Pub> newpubs) throws SQLException {
             if (refreshBest) {
                 user.getBest_pub().refreshAll();
@@ -253,8 +255,12 @@ public class FragmentLayout extends Activity {
             for (int i = 0; i < newpubs.size(); i++) {
                 pubstoString[i] = newpubs.get(i).getName();
             }
-            setListAdapter(new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.simple_list_item_activated_1, pubstoString));
+            arrayadapterPubTitle = new ArrayAdapter<String>(getActivity(),
+                 android.R.layout.simple_list_item_activated_1, pubstoString);
+
+
+
+            setListAdapter(arrayadapterPubTitle);
         }
 
         private void spinnerListner() {
@@ -303,6 +309,7 @@ public class FragmentLayout extends Activity {
         private AppCompatButton gpsAppCompatButton;
         private AppCompatButton bestrate;
         private AppCompatButton removeFavourite;
+        private AppCompatButton rateButton;
         private AppCompatSpinner appCompatSpinner;
         private List<Pub> pubs;
         private User user;
@@ -323,8 +330,6 @@ public class FragmentLayout extends Activity {
 
         public int getShownIndex() {
 
-
-            ratingBar.setRating(Float.parseFloat("0.0"));
             return getArguments().getInt("index", 0);
 
         }
@@ -356,11 +361,11 @@ public class FragmentLayout extends Activity {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
+            rateButton = (AppCompatButton) getActivity().findViewById(R.id.rateButton);
+            ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
             downloadListener();
             locationListener();
             callListener();
-            addListenerOnRatingBar();
             bestRatelistner();
             removeFromListener();
             rateBarListner();
@@ -464,18 +469,7 @@ public class FragmentLayout extends Activity {
             });
         }
 
-        private void addListenerOnRatingBar() {
 
-            ratingBar = (AppCompatRatingBar) getActivity().findViewById(R.id.ratingBar);
-
-            ratingBar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    float a = ratingBar.getRating();
-                }
-            });
-
-        }
 
         private void bestRatelistner() {
             bestrate = (AppCompatButton) getActivity().findViewById(R.id.favouritebutton);
@@ -498,6 +492,12 @@ public class FragmentLayout extends Activity {
                     ;
                     if (!bestpubalready) {
                         user.getBest_pub().add(pubs.get(getShownIndex()));
+                        try {
+                            userDataBaseHelper.updateEntity(user);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    TitlesFragment.arrayadapterPubTitle.notifyDataSetChanged();
 
                     } else {
                         Toast.makeText(getActivity(), "Already added", Toast.LENGTH_SHORT)
@@ -530,6 +530,11 @@ public class FragmentLayout extends Activity {
                     ;
                     if (bestpubalready) {
                         user.getBest_pub().remove(currentPubFromForeignkey[i]);
+                        try {
+                            userDataBaseHelper.updateEntity(user);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
 
                     } else {
                         Toast.makeText(getActivity(), "Not added yet", Toast.LENGTH_SHORT)
@@ -541,12 +546,16 @@ public class FragmentLayout extends Activity {
         }
 
         private void rateBarListner() {
-            AppCompatButton rateButton = (AppCompatButton) getActivity().findViewById(R.id.rateButton);
+
             rateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     pubs.get(getShownIndex()).setRate(ratingBar.getRating());
-
+                    try {
+                        pubDataBaseHelper.updateEntity(pubs.get(getShownIndex()));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
